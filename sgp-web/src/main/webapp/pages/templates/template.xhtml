@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+<f:view>
+	<h:head>
+	<title><ui:insert name="title">Default title</ui:insert></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css"
+		href="#{request.contextPath}/css/afe_estilos.css" />
+	<link rel="icon" href="#{request.contextPath}/favicon.ico"
+		type="image/x-icon" />
+	</h:head>
+	<h:body>
+	<div class="centrado">
+	<table border="0" align="center" cellspacing="0" cellpadding="0" >
+		<tr>
+			<td class="tamanioPagina" align="center">
+			<div id="header"><ui:insert name="header">
+				<ui:include src="header.jsp" />
+			</ui:insert></div>
+			</td>
+		</tr>
+		<tr>
+			<td class="tamanioPagina">
+			<div id="menu"><ui:insert name="menu">
+				<ui:include src="../general/menu.xhtml" />
+			</ui:insert></div>
+			</td>
+		</tr>
+		<tr>
+			<td class="tamanioPagina">
+			<div id="content" >
+				<div style="position: absolute;right: 10%;top: 5%;">
+				<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+					<f:facet name="start">
+						<h:graphicImage value="/images/loading.gif" />
+					</f:facet>
+					
+					<f:facet name="complete">
+						<h:outputText value="" />
+					</f:facet>
+				</p:ajaxStatus>
+				</div>
+			<ui:insert name="content">
+			</ui:insert></div>
+			</td>
+		</tr>
+		<tr>
+			<td class="tamanioPagina">
+			<div id="footer"><ui:insert name="footer">
+				<ui:include src="footer.jsp" />
+			</ui:insert></div>
+			</td>
+		</tr>
+	</table>
+	</div>
+	<ui:insert name="resultado">
+		<ui:include src="../popup/popupResultado.xhtml" />
+	</ui:insert>
+	</h:body>
+</f:view>
+</html>

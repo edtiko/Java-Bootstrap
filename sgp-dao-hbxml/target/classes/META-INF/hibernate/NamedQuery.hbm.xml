@@ -1,0 +1,1053 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+ <sql-query name="consultaHallazgos">
+   <return-scalar column="id" type="java.lang.Integer"/>
+	<return-scalar column="titulo" type="java.lang.String"/>
+	<return-scalar column="descripcion" type="java.lang.String"/>
+	<return-scalar column="fechaCreacion" type="java.util.Date"/>
+	<return-scalar column="fechaEdita" type="java.util.Date"/>
+	<return-scalar column="UsuarioCrea" type="java.lang.String"/>
+	<return-scalar column="tipoHallazgo" type="java.lang.String"/>
+	<return-scalar column="prioridad" type="java.lang.String"/>
+	<return-scalar column="severidad" type="java.lang.String"/>
+	<return-scalar column="causaGeneracion" type="java.lang.Integer"/>
+	<return-scalar column="causaGeneraString" type="java.lang.String"/>
+	<return-scalar column="causaAnulacion" type="java.lang.Integer"/>
+	<return-scalar column="causaAnulaString" type="java.lang.String"/>
+	<return-scalar column="mapaPrueba" type="java.lang.String"/>
+	<return-scalar column="proyecto" type="java.lang.String"/>
+	<return-scalar column="artefacto" type="java.lang.String"/>
+	<return-scalar column="usuarioArtefacto" type="java.lang.String"/>
+	<return-scalar column="accion" type="java.lang.String"/>
+	<return-scalar column="usuarioAsigna" type="java.lang.Integer"/>
+	<return-scalar column="usuarioAsignado" type="java.lang.String"/>
+	<return-scalar column="motivoReasignacion" type="java.lang.String"/>
+	<return-scalar column="usuarioSoluciona" type="java.lang.String"/>
+	<return-scalar column="color" type="java.lang.String"/>
+   	<![CDATA[
+   SELECT    
+	hallazgo.ID_HALLAZGO id,
+        hallazgo.TITULO titulo,
+        hallazgo.DESCRIPCION descripcion,
+        hallazgo.FEC_CREACION fechaCreacion,
+
+        flujoHallazgo.FEC_CREACION fechaEdita,
+        tipoHallazgo.NOMBRE tipoHallazgo,             
+        prioridad.NOMBRE prioridad,
+        severidad.NOMBRE severidad,
+        causaGeneracion.id_causa_de_generacion causaGeneracion,
+        causaGeneracion.NOMBRE causaGeneraString,
+        causaAnulacion.NOMBRE causaAnulaString,
+        causaAnulacion.ID_PARAMETRO causaAnulacion,
+       mapaPrueba.NOMBRE mapaPrueba,
+       proyecto.NOMBRE  proyecto,
+
+artefacto.NOMBRE  artefacto,
+ usuarioArtefacto.NOMBRE usuarioArtefacto,
+estado.NOMBRE accion,	
+usuarioAsigna.Id_usuario usuarioAsigna,
+usuarioAsigna.Nombre usuarioCrea,
+usuarioAsignado.NOMBRE usuarioAsignado,
+ motivoReasigna.nombre motivoReasignacion,		
+                       (SELECT usuario.NOMBRE
+                        FROM  SGP_USUARIO usuario, 
+                              SGP_FLUJO_HALLAZGO flujo
+                         WHERE flujo.accion = 20
+                         AND  flujo.ID_USUARIO_ASIGNA = usuario.ID_USUARIO
+                         AND flujo.ID_HALLAZGO = hallazgo.ID_HALLAZGO
+                         ORDER BY flujo.FEC_CREACION DESC LIMIT 1) usuarioSoluciona,severidad.color color
+from 
+sgp_hallazgo hallazgo
+ LEFT JOIN SGP_Artefacto artefacto ON hallazgo.ID_ARtefacto = artefacto.ID_ARtefacto
+LEFT JOIN SGP_caso_prueba casoprueba ON hallazgo.ID_caso_prueba = casoprueba.ID_caso_prueba
+LEFT JOIN SGP_FLUJO_HALLAZGO flujoHallazgo ON hallazgo.ID_hallazgo = flujoHallazgo.ID_hallazgo
+LEFT JOIN sgp_tipo_hallazgo tipoHallazgo ON hallazgo.TIPO_HALLAZGO = tipoHallazgo.id_tipo_hallazgo
+LEFT JOIN sgp_tipo_prioridad prioridad ON hallazgo.PRIORIDAD = prioridad.id_tipo_prioridad
+LEFT JOIN sgp_tipo_severidad severidad ON hallazgo.SEVERIDAD = severidad.id_tipo_severidad
+LEFT JOIN sgp_causa_de_generacion causaGeneracion ON hallazgo.CAUSA_GENERACION = causaGeneracion.id_causa_de_generacion
+LEFT JOIN SGP_PARAMETRO causaAnulacion ON hallazgo.CAUSA_ANULACION = causaAnulacion.ID_PARAMETRO
+LEFT JOIN SGP_PROYECTO proyecto  ON artefacto.id_proyecto = proyecto.id_proyecto
+LEFT JOIN SGP_mapa_prueba mapaprueba  ON (casoprueba.id_mapa_prueba = mapaprueba.id_mapa_prueba)
+
+LEFT JOIN SGP_USUARIO usuarioArtefacto ON artefacto.ID_USUARIO = usuarioArtefacto.ID_USUARIO
+LEFT JOIN SGP_PARAMETRO estado ON estado.ID_PARAMETRO = flujoHallazgo.accion
+LEFT JOIN SGP_USUARIO usuarioAsigna ON usuarioAsigna.login = hallazgo.usuario_crea
+LEFT JOIN SGP_USUARIO usuarioAsignado ON flujoHallazgo.ID_USUARIO_ASIGNADO = usuarioAsignado.ID_USUARIO
+LEFT JOIN SGP_PARAMETRO motivoReasigna ON hallazgo.MOTIVO_REASIGNACION = motivoReasigna.ID_PARAMETRO
+
+  WHERE 
+	flujoHallazgo.ID_FLUJO_HALLAZGO =
+	(SELECT flujo.ID_FLUJO_HALLAZGO
+	FROM 
+		SGP_FLUJO_HALLAZGO flujo
+ 	WHERE 
+ 		flujo.ID_HALLAZGO = hallazgo.ID_HALLAZGO 
+	ORDER BY flujo.FEC_CREACION DESC LIMIT 1)
+                       
+                         ]]>
+
+</sql-query>
+
+	
+	<sql-query name="consultarCasosDePrueba">
+	
+	    <return-scalar column="id" type="java.lang.Integer"/>
+		<return-scalar column="artefacto" type="java.lang.String" />
+		<return-scalar column="descripcionCasoPrueba" type="java.lang.String" />
+		<return-scalar column="tipoPrueba" type="java.lang.String" />
+		<return-scalar column="resultadoEsperado" type="java.lang.String" />
+		<return-scalar column="fechaCreacion" type="java.util.Date" />
+		<return-scalar column="usuarioCrea" type="java.lang.String" />
+		<return-scalar column="usuarioEjecutor" type="java.lang.String" />
+		<return-scalar column="fechaEjecucion" type="java.util.Date" />
+		<return-scalar column="cumple" type="java.lang.String" />
+	
+		<![CDATA[
+			SELECT cp.id_caso_prueba id, artefacto.nombre artefacto, 
+       		       cp.descripcion descripcionCasoPrueba, 
+       		       tipoPrueba.valor tipoPrueba,
+       		       cp.resultado resultadoEsperado,
+       		       cp.fec_creacion fechaCreacion,
+       		       cp.usuario_crea usuarioCrea,
+       		       cp.usuario_ejecuta usuarioEjecutor,
+       		       cp.fec_ejecuta fechaEjecucion,
+       		       cp.cumple cumple
+
+			FROM sgp_mapa_prueba mp,
+     			 sgp_caso_prueba cp
+     		     INNER JOIN sgp_artefacto artefacto ON cp.id_artefacto = artefacto.id_artefacto
+     		     LEFT JOIN sgp_parametro tipoPrueba ON cp.tipo_prueba = tipoPrueba.id_parametro
+     
+            WHERE mp.id_mapa_prueba = cp.id_mapa_prueba 
+                  AND mp.id_mapa_prueba = :idMapaPrueba 
+      ]]>
+	</sql-query>
+	
+	<sql-query name="totalesHallazgo">
+	
+	    <return-scalar column="totalHallazgos" type="java.lang.Integer" />
+		<return-scalar column="severidad" type="java.lang.String" />
+		<return-scalar column="tipoHallazgo" type="java.lang.String" />
+		<return-scalar column="totalAbierto" type="java.lang.Integer" />
+		<return-scalar column="totalDevuelta" type="java.lang.Integer" />
+		<return-scalar column="totalDesarrollo" type="java.lang.Integer" />
+		<return-scalar column="totalReproceso" type="java.lang.Integer" />
+		<return-scalar column="totalInvalidado" type="java.lang.Integer" />
+		<return-scalar column="totalCerrado" type="java.lang.Integer" />
+		<return-scalar column="totalAnulado" type="java.lang.Integer" />
+		
+	<![CDATA[ 
+	SELECT  
+	    count(hallazgo.ID_HALLAZGO) totalHallazgos,
+	    severidad.nombre    severidad,
+	    tipoHallazgo.nombre tipoHallazgo, 
+        count(abierta)    totalAbierto, 
+        count(devuelta)   totalDevuelta, 	
+        count(desarrollo) totalDesarrollo,
+        count(reproceso)  totalReproceso,
+        count(invalidado) totalInvalidado,
+        count(cerrado)    totalCerrado,
+        count(anulado)    totalAnulado
+        
+FROM SGP_HALLAZGO hallazgo
+     LEFT JOIN SGP_TIPO_HALLAZGO tipoHallazgo ON tipoHallazgo.ID_TIPO_HALLAZGO = hallazgo.TIPO_HALLAZGO
+     LEFT JOIN SGP_CASO_PRUEBA casoPrueba ON casoPrueba.id_caso_prueba = hallazgo.id_caso_prueba 
+     LEFT JOIN SGP_MAPA_PRUEBA mapaPrueba ON mapaPrueba.id_mapa_prueba = casoPrueba.id_mapa_prueba
+     LEFT JOIN SGP_ARTEFACTO artefacto ON  artefacto.id_artefacto = hallazgo.id_artefacto
+     LEFT JOIN SGP_TIPO_SEVERIDAD severidad ON hallazgo.SEVERIDAD = severidad.ID_TIPO_SEVERIDAD,
+     SGP_FLUJO_HALLAZGO flujoHallazgo
+     LEFT JOIN SGP_PARAMETRO abierta    ON abierta.id_parametro    = flujoHallazgo.accion AND abierta.nombre    = 'Abierta'
+     LEFT JOIN SGP_PARAMETRO devuelta   ON devuelta.id_parametro   = flujoHallazgo.accion AND devuelta.nombre   = 'Devuelta'
+     LEFT JOIN SGP_PARAMETRO desarrollo ON desarrollo.id_parametro = flujoHallazgo.accion AND desarrollo.nombre = 'Desarrollo'
+     LEFT JOIN SGP_PARAMETRO reproceso  ON reproceso.id_parametro  = flujoHallazgo.accion AND reproceso.nombre  = 'Reproceso'
+     LEFT JOIN SGP_PARAMETRO anulado    ON anulado.id_parametro    = flujoHallazgo.accion AND anulado.nombre    = 'Anulado'
+     LEFT JOIN SGP_PARAMETRO invalidado ON invalidado.id_parametro = flujoHallazgo.accion AND invalidado.nombre = 'Invalidado'
+     LEFT JOIN SGP_PARAMETRO cerrado    ON cerrado.id_parametro    = flujoHallazgo.accion AND cerrado.nombre    = 'Cerrado'
+     
+WHERE flujoHallazgo.ID_FLUJO_HALLAZGO = (
+     SELECT 
+     flujo.ID_FLUJO_HALLAZGO
+     FROM 
+     SGP_FLUJO_HALLAZGO flujo
+     WHERE 
+     flujo.ID_HALLAZGO = hallazgo.ID_HALLAZGO 
+     ORDER BY flujo.FEC_CREACION DESC LIMIT 1)
+     AND hallazgo.ID_HALLAZGO = flujoHallazgo.ID_HALLAZGO
+     AND (mapaPrueba.ID_PROYECTO = :proyecto or artefacto.id_proyecto = :proyecto) 
+     AND hallazgo.FEC_CREACION  >= COALESCE(:fechaFrom,hallazgo.FEC_CREACION)
+     AND hallazgo.FEC_CREACION  <= COALESCE(:fechaTo,hallazgo.FEC_CREACION)
+     AND tipoHallazgo.NOMBRE  = COALESCE( :tipoHallazgo , tipoHallazgo.NOMBRE)
+     GROUP BY severidad.NOMBRE, tipoHallazgo.nombre
+	]]>
+	</sql-query>
+	
+	<sql-query name="hallazgosUsuarios">
+	
+	    <return-scalar column="tipoHallazgo" type="java.lang.String" />
+		<return-scalar column="tipoSeveridad" type="java.lang.String" />
+		<return-scalar column="usuarioAsignado" type="java.lang.String" />
+		<return-scalar column="totalHallazgos" type="java.lang.Integer" />
+		<![CDATA[ 
+	
+	SELECT  tipoHallazgo.nombre tipoHallazgo,
+     severidad.nombre tipoSeveridad,
+        usuarioAsignado.NOMBRE || ' - ' || usuarioAsignado.CARGO usuarioAsignado,
+(severidad.id_tipo_severidad) totalHallazgos
+FROM SGP_HALLAZGO hallazgo
+     LEFT JOIN SGP_CASO_PRUEBA casoPrueba ON casoPrueba.id_caso_prueba = hallazgo.id_caso_prueba 
+     LEFT JOIN SGP_MAPA_PRUEBA mapaPrueba ON mapaPrueba.id_mapa_prueba = casoPrueba.id_mapa_prueba
+     LEFT JOIN SGP_ARTEFACTO artefacto ON  artefacto.id_artefacto = hallazgo.id_artefacto
+     LEFT JOIN SGP_TIPO_SEVERIDAD severidad   ON severidad.ID_TIPO_SEVERIDAD = hallazgo.SEVERIDAD  
+     LEFT JOIN SGP_TIPO_HALLAZGO tipoHallazgo ON tipoHallazgo.ID_TIPO_HALLAZGO = severidad.ID_TIPO_HALLAZGO,
+     SGP_FLUJO_HALLAZGO flujoHallazgo
+     LEFT JOIN SGP_USUARIO usuarioAsignado ON flujoHallazgo.ID_USUARIO_ASIGNADO = usuarioAsignado.ID_USUARIO,
+     SGP_PARAMETRO estado
+     
+WHERE flujoHallazgo.ID_FLUJO_HALLAZGO = (
+     SELECT 
+     flujo.ID_FLUJO_HALLAZGO
+     FROM 
+     SGP_FLUJO_HALLAZGO flujo
+     WHERE 
+     flujo.ID_HALLAZGO = hallazgo.ID_HALLAZGO 
+     ORDER BY flujo.FEC_CREACION DESC LIMIT 1)
+     AND hallazgo.ID_HALLAZGO = flujoHallazgo.ID_HALLAZGO
+     AND flujoHallazgo.ACCION = estado.ID_PARAMETRO
+     AND estado.NOMBRE NOT IN('Anulado','Invalidado','Cerrado')
+     AND (mapaPrueba.ID_PROYECTO = :proyecto OR artefacto.ID_PROYECTO = :proyecto)
+     AND hallazgo.FEC_CREACION  >= COALESCE(:fechaFrom,hallazgo.FEC_CREACION)
+     AND hallazgo.FEC_CREACION  <= COALESCE(:fechaTo,hallazgo.FEC_CREACION)
+     AND tipoHallazgo.NOMBRE  = COALESCE(:tipoHallazgo , tipoHallazgo.NOMBRE)
+     order by 1,2
+	
+     ]]>
+	</sql-query>
+
+	<sql-query name="consultarCasosPruebaHallazgos">
+		<return-scalar column="id" type="java.lang.Integer" />
+		<return-scalar column="artefacto" type="java.lang.String" />
+		<return-scalar column="descripcionCasoPrueba" type="java.lang.String" />
+		<return-scalar column="tipoPrueba" type="java.lang.String" />
+		<return-scalar column="resultadoEsperado" type="java.lang.String" />
+		<return-scalar column="fechaCreacion" type="java.util.Date" />
+		<return-scalar column="usuarioCrea" type="java.lang.String" />
+		<return-scalar column="usuarioEjecutor" type="java.lang.String" />
+		<return-scalar column="fechaEjecucion" type="java.util.Date" />
+		<return-scalar column="cumple" type="java.lang.String" />
+		<return-scalar column="numeroHallazgo" type="java.lang.Integer" />
+		<return-scalar column="tituloHallazgo" type="java.lang.String" />
+		<return-scalar column="descripcionHallazgo" type="java.lang.String" />
+		<return-scalar column="tipoHallazgo" type="java.lang.String" />
+		<return-scalar column="severidad" type="java.lang.String" />
+		<return-scalar column="prioridad" type="java.lang.String" />
+		<return-scalar column="responsableRealizarAjuestes" type="java.lang.String" />
+		<return-scalar column="estadoHallazgo" type="java.lang.String" />
+		<return-scalar column="fechaEstadoHallazgo" type="java.util.Date" />
+		<return-scalar column="causaGeneracion" type="java.lang.String" />
+		<return-scalar column="causaAnulacion" type="java.lang.String" />
+		
+		<![CDATA[
+		   SELECT idcasoprueba id,
+		          artefacto,
+		          descripcioncasoprueba descripcionCasoPrueba,
+		          tipoprueba tipoPrueba,
+		          resultadoesperado resultadoEsperado,
+		          fechacreacion fechaCreacion,
+		          usuarioCrea usuarioCrea,
+		          usuarioejecutor usuarioEjecutor,
+		          fechaEjecucion fechaEjecucion,
+		          cumple,
+		          numerohallazgo numeroHallazgo,
+		          titulohallazgo tituloHallazgo,
+		          descripcionhallazgo descripcionHallazgo,
+		          tipohallazgo tipoHallazgo,
+		          severidad,
+		          prioridad,
+		          responsablerealizarajustes responsableRealizarAjuestes,
+		          estadohallazgo estadoHallazgo,
+		          fechaestadohallazgo fechaEstadoHallazgo,
+		          causageneracion causaGeneracion,
+		          causaanulacion causaAnulacion
+		   FROM sgp_reporte_mapa_pruebas_view
+		   WHERE id_mapa_prueba = :idMapaPrueba   
+		          
+		]]>
+	</sql-query>
+
+    <!-- Esta consulta trae tambien los mapas de pruebas que no tienen casos de prueba -->
+	<sql-query name="reporteAvanceEjecucionMapasFull">
+		<return-scalar column="id" type="java.lang.Integer" />
+		<return-scalar column="nombre" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasConstruidas" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasEjecutadas" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasAnuladas" type="java.lang.Integer" />
+		
+		<![CDATA[
+		   SELECT mp.id_mapa_prueba id,
+                  mp.nombre nombre,
+                  
+                  (SELECT COUNT(*)
+                   FROM sgp_caso_prueba cp
+                   WHERE cp.id_mapa_prueba = mp.id_mapa_prueba) AS totalPruebasConstruidas,
+                  
+                  (SELECT COUNT(*)
+                   FROM sgp_caso_prueba cp
+                   WHERE cp.id_mapa_prueba = mp.id_mapa_prueba
+                     AND cp.cumple IS NOT NULL) AS totalPruebasEjecutadas,
+                  
+                  (SELECT COUNT(*)
+                   FROM sgp_caso_prueba cp
+                   WHERE cp.id_mapa_prueba = mp.id_mapa_prueba
+                     AND cp.cumple = 'NA') AS totalPruebasAnuladas
+		          
+		   FROM sgp_mapa_prueba mp
+		   WHERE mp.id_proyecto = :idProyecto
+		   ORDER BY mp.id_mapa_prueba ASC   
+		          
+		]]>
+	</sql-query>
+	
+	<sql-query name="consultarMapaPruebasReporte">
+		<return-scalar column="idProyecto" type="java.lang.Integer" />
+		<return-scalar column="idMapaPrueba" type="java.lang.Integer" />
+		<return-scalar column="nombreMapa" type="java.lang.String" />
+		<return-scalar column="fechaCreacionMapa" type="java.util.Date" />
+		<return-scalar column="id" type="java.lang.Integer" />
+		<return-scalar column="artefacto" type="java.lang.String" />
+		<return-scalar column="descripcionCasoPrueba" type="java.lang.String" />
+		<return-scalar column="tipoPrueba" type="java.lang.String" />
+		<return-scalar column="resultadoEsperado" type="java.lang.String" />
+		<return-scalar column="fechaCreacion" type="java.util.Date" />
+		<return-scalar column="usuarioCrea" type="java.lang.String" />
+		<return-scalar column="usuarioEjecutor" type="java.lang.String" />
+		<return-scalar column="fechaEjecucion" type="java.util.Date" />
+		<return-scalar column="cumple" type="java.lang.String" />
+		<return-scalar column="numeroHallazgo" type="java.lang.Integer" />
+		<return-scalar column="tituloHallazgo" type="java.lang.String" />
+		<return-scalar column="descripcionHallazgo" type="java.lang.String" />
+		<return-scalar column="tipoHallazgo" type="java.lang.String" />
+		<return-scalar column="severidad" type="java.lang.String" />
+		<return-scalar column="prioridad" type="java.lang.String" />
+		<return-scalar column="responsableRealizarAjuestes" type="java.lang.String" />
+		<return-scalar column="estadoHallazgo" type="java.lang.String" />
+		<return-scalar column="fechaEstadoHallazgo" type="java.util.Date" />
+		<return-scalar column="causaGeneracion" type="java.lang.String" />
+		<return-scalar column="causaAnulacion" type="java.lang.String" />
+		
+		<![CDATA[
+		   SELECT id_proyecto idProyecto,
+		          id_mapa_prueba idMapaPrueba,
+		          nombre_mapa nombreMapa,
+		          fec_creacion_mapa fechaCreacionMapa,
+		          idcasoprueba id,
+		          artefacto,
+		          descripcioncasoprueba descripcionCasoPrueba,
+		          tipoprueba tipoPrueba,
+		          resultadoesperado resultadoEsperado,
+		          fechacreacion fechaCreacion,
+		          usuarioCrea usuarioCrea,
+		          usuarioejecutor usuarioEjecutor,
+		          fechaEjecucion fechaEjecucion,
+		          cumple,
+		          numerohallazgo numeroHallazgo,
+		          titulohallazgo tituloHallazgo,
+		          descripcionhallazgo descripcionHallazgo,
+		          tipohallazgo tipoHallazgo,
+		          severidad,
+		          prioridad,
+		          responsablerealizarajustes responsableRealizarAjuestes,
+		          estadohallazgo estadoHallazgo,
+		          fechaestadohallazgo fechaEstadoHallazgo,
+		          causageneracion causaGeneracion,
+		          causaanulacion causaAnulacion
+		   FROM sgp_view_reporte_mapa_pruebas
+           WHERE id_mapa_prueba = COALESCE(:idMapaPrueba, id_mapa_prueba)
+             AND id_proyecto = COALESCE(:idProyecto, id_proyecto)
+             AND fec_creacion_mapa >= COALESCE(:fechaFrom, fec_creacion_mapa)
+             AND fec_creacion_mapa <= COALESCE(:fechaTo, fec_creacion_mapa)
+		]]>
+	</sql-query>
+
+    <!-- Esta consulta solo trae los mapas de pruebas que tienen al menos (1) caso de prueba -->
+	<sql-query name="reporteAvanceEjecucionMapas">
+		<return-scalar column="id" type="java.lang.Integer" />
+		<return-scalar column="nombre" type="java.lang.String" />
+		<return-scalar column="totalPruebasConstruidas" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasEjecutadas" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasSatisfactorias" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasInsatisfactorias" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasAnuladas" type="java.lang.Integer" />
+		
+		<![CDATA[
+		   SELECT mp.id_mapa_prueba id,
+                  mp.nombre nombre,
+                  
+                  COUNT(cp.id_caso_prueba) AS totalPruebasConstruidas,
+                  COUNT(CASE WHEN cp.cumple = 'No' OR cp.cumple = 'Si' THEN 1 ELSE NULL END) AS totalPruebasEjecutadas,
+                  COUNT(CASE WHEN cp.cumple = 'Si' THEN 1 ELSE NULL END) AS totalPruebasSatisfactorias,
+                  COUNT(CASE WHEN cp.cumple = 'No' THEN 1 ELSE NULL END) AS totalPruebasInsatisfactorias,
+                  COUNT(CASE WHEN cp.cumple = 'NA' THEN 1 ELSE NULL END) AS totalPruebasAnuladas
+		          
+		   FROM sgp_mapa_prueba mp, sgp_caso_prueba cp
+		   WHERE mp.id_proyecto = :idProyecto
+		   AND cp.id_mapa_prueba = mp.id_mapa_prueba
+		   AND (cp.fec_creacion >= COALESCE(:fechaFrom, cp.fec_creacion) AND cp.fec_creacion <= COALESCE(:fechaTo, cp.fec_creacion)
+		        OR cp.fec_ejecuta >= COALESCE(:fechaFrom, cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo, cp.fec_ejecuta))
+		   AND cp.id_mapa_prueba = mp.id_mapa_prueba
+		   GROUP BY mp.id_mapa_prueba, mp.nombre
+		   ORDER BY mp.id_mapa_prueba ASC   
+		          
+		]]>
+	</sql-query>
+	
+    <!-- Esta consulta solo trae los mapas de pruebas que tienen al menos (1) caso de prueba.
+         Tambien filtra por fecha de corte. -->
+	<sql-query name="reporteAvanceEjecucionMapasFechaCorte">
+		<return-scalar column="id" type="java.lang.Integer" />
+		<return-scalar column="nombre" type="java.lang.String" />
+		<return-scalar column="totalPruebasConstruidas" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasEjecutadas" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasSatisfactorias" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasInsatisfactorias" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasAnuladas" type="java.lang.Integer" />
+		
+		<![CDATA[
+		   SELECT mp.id_mapa_prueba id,
+                  mp.nombre nombre,
+                  
+                  COUNT(CASE WHEN (cp.fec_creacion >= COALESCE(:fechaFrom,cp.fec_creacion) AND cp.fec_creacion <= COALESCE(:fechaTo,cp.fec_creacion))
+                        THEN cp.id_caso_prueba ELSE NULL END) AS totalPruebasConstruidas,
+                        
+                  COUNT(CASE WHEN (cp.cumple = 'No' OR cp.cumple = 'Si') 
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta)) 
+                        THEN 1 ELSE NULL END) AS totalPruebasEjecutadas,
+                        
+                  COUNT(CASE WHEN (cp.cumple = 'Si')
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta))
+                        THEN 1 ELSE NULL END) AS totalPruebasSatisfactorias,
+                        
+                  COUNT(CASE WHEN (cp.cumple = 'No')
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta)) 
+                        THEN 1 ELSE NULL END) AS totalPruebasInsatisfactorias,
+                        
+                  COUNT(CASE WHEN (cp.cumple = 'NA')
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta))
+                        THEN 1 ELSE NULL END) AS totalPruebasAnuladas
+		          
+		   FROM sgp_mapa_prueba mp, sgp_caso_prueba cp
+		   WHERE mp.id_proyecto = :idProyecto
+		   AND cp.id_mapa_prueba = mp.id_mapa_prueba
+		   GROUP BY mp.id_mapa_prueba, mp.nombre
+		   ORDER BY mp.id_mapa_prueba ASC   
+		          
+		]]>
+	</sql-query>
+	
+    <!-- Consulta para la grilla: esta consulta solo trae los mapas de pruebas que tienen al menos (1) caso de prueba.
+         filtra por fecha de corte. -->
+	<sql-query name="reporteAvanceEjecucionMapasGrilla">
+		<return-scalar column="id" type="java.lang.Integer" />
+		<return-scalar column="nombre" type="java.lang.String" />
+				<return-scalar column="fecCreacion" type="java.util.Date" />
+		<return-scalar column="idProyecto" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasConstruidas" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasEjecutadas" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasSatisfactorias" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasInsatisfactorias" type="java.lang.Integer" />
+		<return-scalar column="totalPruebasAnuladas" type="java.lang.Integer" />
+
+		<![CDATA[
+		   SELECT mp.id_mapa_prueba id,
+                  mp.nombre nombre,
+                  mp.id_proyecto idProyecto,
+                   min(mp.fec_creacion) fec_creacion,
+                  COUNT(CASE WHEN (cp.fec_creacion >= COALESCE(:fechaFrom,cp.fec_creacion) AND  cp.fec_creacion <= COALESCE(:fechaTo,cp.fec_creacion))
+                        THEN cp.id_caso_prueba ELSE NULL END) AS totalPruebasConstruidas,
+                        
+                  COUNT(CASE WHEN (cp.cumple = 'No' OR cp.cumple = 'Si') 
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta)) 
+                        THEN 1 ELSE NULL END) AS totalPruebasEjecutadas,
+                        
+                  COUNT(CASE WHEN (cp.cumple = 'Si')
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta))
+                        THEN 1 ELSE NULL END) AS totalPruebasSatisfactorias,
+                        
+                  COUNT(CASE WHEN (cp.cumple = 'No')
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta)) 
+                        THEN 1 ELSE NULL END) AS totalPruebasInsatisfactorias,
+                        
+                  COUNT(CASE WHEN (cp.cumple = 'NA')
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta))
+                        THEN 1 ELSE NULL END) AS totalPruebasAnuladas
+		          
+		   FROM sgp_mapa_prueba mp, sgp_caso_prueba cp, sgp_proyecto pr
+		   WHERE mp.id_proyecto = COALESCE(:idProyecto,mp.id_proyecto) 
+		   AND mp.fec_creacion <= COALESCE(:fechaTo,mp.fec_creacion) 
+		   
+		   AND cp.id_mapa_prueba = mp.id_mapa_prueba
+		   AND pr.id_proyecto = mp.id_proyecto 
+		          
+		]]>
+	</sql-query>
+	
+    <!-- Consulta para la grilla: realiza la sumatoria de la consulta reporteAvanceEjecucionMapasGrilla. -->
+	<sql-query name="sumatoriaReporteAvanceEjecucionMapas">
+		<return-scalar column="sumatoriaPruebasConstruidas" type="java.lang.Integer" />
+		<return-scalar column="sumatoriaPruebasEjecutadas" type="java.lang.Integer" />
+		<return-scalar column="sumatoriaPruebasSatisfactorias" type="java.lang.Integer" />
+		<return-scalar column="sumatoriaPruebasInsatisfactorias" type="java.lang.Integer" />
+		<return-scalar column="sumatoriaPruebasAnuladas" type="java.lang.Integer" />
+		
+		<![CDATA[
+		   SELECT
+                  SUM(COUNT(CASE WHEN (cp.fec_creacion >= COALESCE(:fechaFrom,cp.fec_creacion) AND cp.fec_creacion <= COALESCE(:fechaTo,cp.fec_creacion))
+                        THEN cp.id_caso_prueba ELSE NULL END)) OVER (ORDER BY mp.id_mapa_prueba) AS sumatoriaPruebasConstruidas,
+                        
+                  SUM(COUNT(CASE WHEN (cp.cumple = 'No' OR cp.cumple = 'Si') 
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta)) 
+                        THEN 1 ELSE NULL END)) OVER (ORDER BY mp.id_mapa_prueba) AS sumatoriaPruebasEjecutadas,
+
+                  SUM(COUNT(CASE WHEN (cp.cumple = 'Si')
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta))
+                        THEN 1 ELSE NULL END)) OVER (ORDER BY mp.id_mapa_prueba) AS sumatoriaPruebasSatisfactorias,
+
+                  SUM(COUNT(CASE WHEN (cp.cumple = 'No')
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta)) 
+                        THEN 1 ELSE NULL END)) OVER (ORDER BY mp.id_mapa_prueba) AS sumatoriaPruebasInsatisfactorias,
+
+                  SUM(COUNT(CASE WHEN (cp.cumple = 'NA')
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta))
+                        THEN 1 ELSE NULL END)) OVER (ORDER BY mp.id_mapa_prueba) AS sumatoriaPruebasAnuladas
+		          
+		   FROM sgp_mapa_prueba mp, sgp_caso_prueba cp
+		   WHERE mp.id_proyecto = COALESCE(:idProyecto,mp.id_proyecto)
+		   AND cp.id_mapa_prueba = mp.id_mapa_prueba
+		   GROUP BY mp.id_mapa_prueba
+		   ORDER BY mp.id_mapa_prueba DESC LIMIT 1   
+		          
+		]]>
+	</sql-query>
+	
+	<sql-query name="consultarAnexoContainsRuta">
+		<return-scalar column="id" type="java.lang.Integer"/>
+		<return-scalar column="idHallazgo" type="java.lang.Integer" />
+		<return-scalar column="ruta" type="java.lang.String"/>
+		
+		<![CDATA[
+			SELECT ah.id_anexo_hallazgo id,
+				   ah.id_hallazgo idHallazgo,
+				   ah.ruta ruta
+			FROM sgp_anexo_hallazgo ah
+			WHERE (LOWER(ruta)) LIKE :rutaAnexo
+		]]>
+	</sql-query>
+	
+	<!-- Consulta el maximo consecutivo de los casos de prueba de un mapa de prueba -->
+	<sql-query name="consultarConsecutivo">
+		<return-scalar column="consecutivo" type="java.lang.Integer"/>
+		
+		<![CDATA[
+			SELECT MAX(consecutivo) consecutivo
+			FROM sgp_caso_prueba
+			WHERE id_mapa_prueba = :idmapa
+		]]>
+	</sql-query>
+	
+	<!-- Consulta indicador calidad en la documentacion -->
+	<sql-query name="consultarIndicadorCalidadDocumentacion">
+		<return-scalar column="artefactoNombre" type="java.lang.String"/>
+		<return-scalar column="artefactoId" type="java.lang.Integer"/>
+		<return-scalar column="severidadNombre" type="java.lang.String"/>
+		<return-scalar column="hallazgos" type="java.lang.Integer"/>
+		<return-scalar column="puntuacion" type="java.lang.Double"/>
+		
+		<![CDATA[
+		SELECT 
+                 artefacto.NOMBRE artefactoNombre,
+                 artefacto.ID_ARTEFACTO artefactoId, 
+                 severidad.NOMBRE severidadNombre,
+                 COUNT(h.id_hallazgo) hallazgos,
+                 SUM(prioridad.puntaje) puntuacion 
+            FROM sgp_artefacto artefacto
+				Left JOIN    sgp_hallazgo h     on  ((artefacto.id_artefacto=h.id_artefacto      AND h.tipo_hallazgo = :idTipoHallazgo ) 	
+				AND (h.fec_creacion >= COALESCE(:fechaFrom,h.fec_creacion) 
+				AND h.fec_creacion <= COALESCE(:fechaTo,h.fec_creacion)))
+                LEFT JOIN sgp_tipo_severidad severidad ON (h.severidad = severidad.id_tipo_severidad AND severidad.ind_activo = 1)
+                LEFT JOIN sgp_tipo_prioridad prioridad ON h.prioridad = prioridad.id_tipo_prioridad
+            WHERE artefacto.id_proyecto = :idProyecto  
+              AND (artefacto.fec_creacion >= COALESCE(:fechaFrom,artefacto.fec_creacion) 
+				AND artefacto.fec_creacion <= COALESCE(:fechaTo,artefacto.fec_creacion))
+            GROUP BY artefactoNombre, severidadNombre, h.severidad, artefactoId
+            ORDER BY artefactoId, severidadNombre
+
+		]]>
+	</sql-query>
+	
+	<!-- Consulta Indicador de Calidad por Funcionalidad (ICF) -->
+	<sql-query name="consultarIndicadorCalidadPorFuncionalidad">
+		<return-scalar column="artefactoNombre" type="java.lang.String" />
+		<return-scalar column="usuario" type="java.lang.String" />
+		<return-scalar column="pruebasEjecutadas" type="java.lang.Integer" />
+		<return-scalar column="hallazgosReportados" type="java.lang.Integer" />
+		<return-scalar column="hallazgosInvalidados" type="java.lang.Integer" />
+		<return-scalar column="hallazgosAnulados" type="java.lang.Integer" />
+		
+		<![CDATA[
+SELECT
+	artefacto.NOMBRE artefactoNombre,
+	usuario.NOMBRE usuario,
+	artefacto.ID_ARTEFACTO artefactoId,
+	(SELECT COUNT(CASE WHEN cp.cumple = 'No' OR cp.cumple = 'Si' THEN 1 ELSE NULL END)
+	FROM sgp_caso_prueba cp, sgp_mapa_prueba mp
+	WHERE mp.id_proyecto =   :idProyecto AND cp.id_artefacto = artefacto.ID_ARTEFACTO
+	AND (cp.fec_creacion >= COALESCE(:fechaFrom,cp.fec_creacion) 
+    AND cp.fec_creacion <= COALESCE(:fechaTo,cp.fec_creacion))
+	AND cp.id_mapa_prueba = mp.id_mapa_prueba) AS pruebasEjecutadas,
+	
+    ( select count(h.id_hallazgo) from sgp_artefacto ar, sgp_hallazgo h inner join ( select id_hallazgo, max(id_flujo_hallazgo) 
+		from sgp_flujo_hallazgo where accion <>25 and accion <> 24 group by id_hallazgo ) as hha on h.id_hallazgo=hha.id_hallazgo
+		where h.id_artefacto=ar.id_artefacto and ar.id_proyecto=  :idProyecto  and artefacto.id_artefacto=h.id_artefacto
+		and h.tipo_hallazgo=3
+		AND (h.fec_creacion >= COALESCE(:fechaFrom,h.fec_creacion) 
+    	AND h.fec_creacion <= COALESCE(:fechaTo,h.fec_creacion))
+		group by ar.nombre) AS hallazgosReportados,
+		
+     ( select count(h.id_hallazgo) from sgp_artefacto ar, sgp_hallazgo h inner join ( select id_hallazgo, max(id_flujo_hallazgo) 
+		from sgp_flujo_hallazgo where accion =25  group by id_hallazgo ) as hha on h.id_hallazgo=hha.id_hallazgo
+		where h.id_artefacto=ar.id_artefacto and ar.id_proyecto=  :idProyecto and h.causa_anulacion is null and artefacto.id_artefacto=h.id_artefacto
+		and h.tipo_hallazgo=3
+		AND (h.fec_creacion >= COALESCE(:fechaFrom,h.fec_creacion) 
+    	AND h.fec_creacion <= COALESCE(:fechaTo,h.fec_creacion))
+		group by ar.nombre) AS hallazgosInvalidados,
+		
+     ( select count(h.id_hallazgo) from sgp_artefacto ar, sgp_hallazgo h inner join ( select id_hallazgo, max(id_flujo_hallazgo) 
+		from sgp_flujo_hallazgo where accion = 24 group by id_hallazgo ) as hha on h.id_hallazgo=hha.id_hallazgo
+		where h.id_artefacto=ar.id_artefacto and ar.id_proyecto=  :idProyecto and h.causa_anulacion is not null and artefacto.id_artefacto=h.id_artefacto
+		AND h.tipo_hallazgo=3
+		AND (h.fec_creacion >= COALESCE(:fechaFrom,h.fec_creacion) 
+    	AND h.fec_creacion <= COALESCE(:fechaTo,h.fec_creacion))
+		group by ar.nombre) AS hallazgosAnulados
+     			
+   FROM
+     			sgp_proyecto p, 
+     			sgp_mapa_prueba mp,
+     			sgp_caso_prueba cp,
+     			sgp_hallazgo h
+     			  JOIN sgp_flujo_hallazgo flujoHallazgo ON h.id_hallazgo = flujoHallazgo.id_hallazgo,
+     			sgp_artefacto artefacto
+     			  LEFT JOIN sgp_usuario usuario ON artefacto.id_usuario = usuario.id_usuario
+     			  
+     		WHERE artefacto.id_proyecto =   :idProyecto
+
+    		AND cp.id_mapa_prueba = mp.id_mapa_prueba
+    		AND h.id_caso_prueba = cp.id_caso_prueba
+    		AND (h.fec_creacion >= COALESCE(:fechaFrom,h.fec_creacion) 
+    		AND h.fec_creacion <= COALESCE(:fechaTo,h.fec_creacion))
+    		GROUP BY artefactoNombre, artefactoId, usuario
+			ORDER BY artefactoId
+		]]>
+	</sql-query>
+	
+	 <!-- Consulta Indicador Reproceso en el Diseño de Pruebas -->
+	<sql-query name="consultarIndicadorReprocesoConstruccionPruebas">
+		<return-scalar column="pruebasConstruidas" type="java.lang.Integer" />
+		<return-scalar column="pruebasNoAplican" type="java.lang.Integer" />
+		
+		<![CDATA[
+		   SELECT COUNT(CASE WHEN (cp.fec_creacion >= COALESCE(:fechaFrom,cp.fec_creacion) AND cp.fec_creacion <= COALESCE(:fechaTo,cp.fec_creacion))
+                        THEN cp.id_caso_prueba ELSE NULL END) AS pruebasConstruidas,
+                        
+                  COUNT(CASE WHEN (cp.cumple = 'NA')
+                                   AND (cp.fec_ejecuta >= COALESCE(:fechaFrom,cp.fec_ejecuta) AND cp.fec_ejecuta <= COALESCE(:fechaTo,cp.fec_ejecuta))
+                        THEN 1 ELSE NULL END) AS pruebasNoAplican
+		          
+		   FROM sgp_mapa_prueba mp, sgp_caso_prueba cp
+		   WHERE mp.id_proyecto = COALESCE(:idProyecto,mp.id_proyecto)
+		   AND cp.id_mapa_prueba = mp.id_mapa_prueba
+		          
+		]]>
+	</sql-query>
+	
+	
+	<!-- Consulta Indicador Efectividad en los Hallazgos Reportados -->
+	<sql-query name="consultarIndicadorEfectividadHallazgosReportados">
+		<return-scalar column="hallazgosReportados" type="java.lang.Integer" />
+		<return-scalar column="hallazgosInvalidados" type="java.lang.Integer" />
+		<return-scalar column="hallazgosAnulados" type="java.lang.Integer" />
+		
+		<![CDATA[
+SELECT
+COUNT(h.id_hallazgo) AS hallazgosReportados,
+COUNT(CASE WHEN flujoHallazgo.accion = 25 THEN 1 ELSE NULL END) AS hallazgosInvalidados,
+COUNT(CASE WHEN flujoHallazgo.accion = 24 THEN 1 ELSE NULL END) AS hallazgosAnulados
+FROM
+sgp_artefacto ar,
+sgp_hallazgo h
+left join  SGP_FLUJO_HALLAZGO flujoHallazgo ON h.ID_HALLAZGO =flujoHallazgo.ID_HALLAZGO and (flujoHallazgo.ID_FLUJO_HALLAZGO = (
+SELECT flujo.ID_FLUJO_HALLAZGO FROM  SGP_FLUJO_HALLAZGO flujo WHERE flujo.ID_HALLAZGO = h.ID_HALLAZGO ORDER BY flujo.FEC_CREACION DESC LIMIT 1))
+WHERE     h.id_artefacto=ar.id_artefacto
+AND	ar.id_proyecto = :idProyecto
+AND (h.fec_creacion >= COALESCE(:fechaFrom,h.fec_creacion) 
+AND h.fec_creacion <= COALESCE(:fechaTo,h.fec_creacion))
+		]]>
+	</sql-query>
+	
+	<sql-query name="hallazgosPorRecurso">
+	    <return-scalar column="responsable" type="java.lang.String" />
+		<return-scalar column="bloqueantes" type="java.lang.Integer" />
+		<return-scalar column="funcionales" type="java.lang.Integer" />
+		<return-scalar column="presentacion" type="java.lang.Integer" />
+		<return-scalar column="pruebaEjecutada" type="java.lang.Integer" />
+		<![CDATA[
+	SELECT usuario.NOMBRE as responsable,
+(select count(hallazgo.id_hallazgo)
+FROM SGP_HALLAZGO  hallazgo
+inner join sgp_artefacto artefacto on (artefacto.id_artefacto = hallazgo.id_artefacto)
+inner join SGP_USUARIO usuarioB on artefacto.ID_USUARIO = usuariob.ID_USUARIO
+inner JOIN SGP_TIPO_SEVERIDAD bloqueantes ON hallazgo.severidad = bloqueantes.id_tipo_severidad AND bloqueantes.NOMBRE = 'Bloqueante'  
+left join  SGP_FLUJO_HALLAZGO flujoHallazgo ON hallazgo.ID_HALLAZGO =flujoHallazgo.ID_HALLAZGO and (flujoHallazgo.ID_FLUJO_HALLAZGO = (
+SELECT flujo.ID_FLUJO_HALLAZGO FROM  SGP_FLUJO_HALLAZGO flujo WHERE flujo.ID_HALLAZGO = hallazgo.ID_HALLAZGO ORDER BY flujo.FEC_CREACION DESC LIMIT 1))
+where  hallazgo.TIPO_HALLAZGO = 3 and artefacto.id_proyecto=:proyecto  and usuariob.Nombre=usuario.NOMBRE   
+AND flujoHallazgo.ACCION NOT IN(:estados)
+and hallazgo.CAUSA_GENERACION not in(:causas)
+AND (hallazgo.fec_creacion >= COALESCE(:fechaFrom, hallazgo.fec_creacion) 
+AND hallazgo.fec_creacion <= COALESCE(:fechaTo, hallazgo.fec_creacion))
+group by usuariob.Nombre) bloqueantes,
+
+(select count(hallazgo.id_hallazgo)
+FROM SGP_HALLAZGO  hallazgo
+inner join sgp_artefacto artefacto on (artefacto.id_artefacto = hallazgo.id_artefacto)
+inner join SGP_USUARIO usuarioB on artefacto.ID_USUARIO = usuariob.ID_USUARIO
+inner JOIN SGP_TIPO_SEVERIDAD funcionales ON hallazgo.severidad = funcionales.id_tipo_severidad AND funcionales.NOMBRE = 'Funcional'    AND hallazgo.TIPO_HALLAZGO = 3
+left join  SGP_FLUJO_HALLAZGO flujoHallazgo ON hallazgo.ID_HALLAZGO =flujoHallazgo.ID_HALLAZGO and (flujoHallazgo.ID_FLUJO_HALLAZGO = (
+SELECT flujo.ID_FLUJO_HALLAZGO FROM  SGP_FLUJO_HALLAZGO flujo WHERE flujo.ID_HALLAZGO = hallazgo.ID_HALLAZGO ORDER BY flujo.FEC_CREACION DESC LIMIT 1))
+where 
+hallazgo.TIPO_HALLAZGO = 3 and artefacto.id_proyecto=:proyecto  and usuariob.Nombre=usuario.NOMBRE   
+AND flujoHallazgo.ACCION NOT IN(:estados)     and hallazgo.CAUSA_GENERACION not in(:causas)
+AND (hallazgo.fec_creacion >= COALESCE(:fechaFrom, hallazgo.fec_creacion) 
+AND hallazgo.fec_creacion <= COALESCE(:fechaTo, hallazgo.fec_creacion))
+group by usuariob.Nombre) funcionales, 
+
+(select count(hallazgo.id_hallazgo)
+FROM SGP_HALLAZGO  hallazgo
+inner join sgp_artefacto artefacto on (artefacto.id_artefacto = hallazgo.id_artefacto)
+inner join SGP_USUARIO usuarioB on artefacto.ID_USUARIO = usuariob.ID_USUARIO
+inner JOIN SGP_TIPO_SEVERIDAD presentacion ON hallazgo.severidad = presentacion.id_tipo_severidad AND presentacion.NOMBRE = 'Presentación'    AND hallazgo.TIPO_HALLAZGO = 3
+left join  SGP_FLUJO_HALLAZGO flujoHallazgo ON hallazgo.ID_HALLAZGO =flujoHallazgo.ID_HALLAZGO and (flujoHallazgo.ID_FLUJO_HALLAZGO = (
+SELECT flujo.ID_FLUJO_HALLAZGO FROM  SGP_FLUJO_HALLAZGO flujo WHERE flujo.ID_HALLAZGO = hallazgo.ID_HALLAZGO ORDER BY flujo.FEC_CREACION DESC LIMIT 1))
+where 
+hallazgo.TIPO_HALLAZGO = 3 and artefacto.id_proyecto=:proyecto  and usuariob.Nombre=usuario.NOMBRE   
+AND flujoHallazgo.ACCION NOT IN(:estados)     and hallazgo.CAUSA_GENERACION not in(:causas)
+AND (hallazgo.fec_creacion >= COALESCE(:fechaFrom, hallazgo.fec_creacion) 
+AND hallazgo.fec_creacion <= COALESCE(:fechaTo, hallazgo.fec_creacion))
+group by usuariob.Nombre) presentacion, 
+
+(select         COUNT(CASE WHEN casoPrueba.cumple = 'No' OR casoPrueba.cumple = 'Si' THEN 1 ELSE NULL END)  from 
+sgp_caso_prueba casoPrueba 
+left join sgp_artefacto artefacto ON casoPrueba.id_Artefacto=artefacto.id_artefacto
+left join sgp_usuario usuario1 ON artefacto.id_usuario=usuario1.id_usuario
+where artefacto.id_proyecto=:proyecto  and usuario1.Nombre is not null and usuario1.Nombre=usuario.NOMBRE 
+AND (casoPrueba.fec_creacion >= COALESCE(:fechaFrom, casoPrueba.fec_creacion) 
+AND casoPrueba.fec_creacion <= COALESCE(:fechaTo, casoPrueba.fec_creacion))
+group by usuario1.nombre) pruebaEjecutada
+
+FROM sgp_artefacto artefacto
+
+left join SGP_USUARIO usuario on artefacto.ID_USUARIO = usuario.ID_USUARIO
+WHERE (artefacto.id_proyecto = :proyecto  and usuario.NOMBRE is not null)    
+AND (artefacto.fec_creacion >= COALESCE(:fechaFrom, artefacto.fec_creacion) 
+AND artefacto.fec_creacion <= COALESCE(:fechaTo, artefacto.fec_creacion))
+GROUP BY responsable
+order by responsable asc
+		]]>
+	</sql-query>
+	
+	<!-- Consulta Indicador Mejoras Identificadas -->
+	<sql-query name="consultarIndicadorMejorasIdentificadas">
+		<return-scalar column="usuarioResponsable" type="java.lang.String"/>
+		<return-scalar column="idUsuario" type="java.lang.Integer"/>
+		<return-scalar column="mejoras" type="java.lang.Integer"/>
+		<return-scalar column="mejorasAnuladas" type="java.lang.Integer"/>
+		<return-scalar column="mejorasInvalidadas" type="java.lang.Integer"/>
+		<return-scalar column="mejorasAceptadas" type="java.lang.Integer"/>
+		
+		<![CDATA[
+			SELECT
+	             usuario.nombre usuarioResponsable,
+	             usuario.ID_USUARIO idUsuario,
+                 (SELECT COUNT(h.id_hallazgo)
+                  FROM sgp_hallazgo h,sgp_mapa_prueba mp, sgp_caso_prueba cp, sgp_proyecto p
+                  WHERE p.id_proyecto = :idProyecto AND p.id_proyecto = mp.id_proyecto
+                   AND cp.id_mapa_prueba = mp.id_mapa_prueba AND h.id_caso_prueba = cp.id_caso_prueba
+                   AND h.tipo_hallazgo = 4 AND h.usuario_crea = usuario.login
+                   AND (h.fec_creacion >= COALESCE(:fechaFrom,h.fec_creacion) AND h.fec_creacion <= COALESCE(:fechaTo,h.fec_creacion))) AS mejoras,  
+                 COUNT(CASE WHEN fh.accion = 24 THEN 1 ELSE NULL END) AS mejorasAnuladas,
+                 COUNT(CASE WHEN fh.accion = 25 THEN 1 ELSE NULL END) AS mejorasInvalidadas,
+                 COUNT(CASE WHEN fh.accion = 23 THEN 1 ELSE NULL END) AS mejorasAceptadas
+            FROM sgp_hallazgo h
+                  LEFT JOIN sgp_usuario usuario ON usuario.login = h.usuario_crea,
+                 sgp_flujo_hallazgo fh,
+                  --LEFT JOIN sgp_parametro parametro ON parametro.id_parametro = fh.accion,
+                 sgp_mapa_prueba mp,
+                 sgp_caso_prueba cp,
+                 sgp_proyecto p
+            WHERE p.id_proyecto = :idProyecto
+	         AND p.id_proyecto = mp.id_proyecto
+                 AND cp.id_mapa_prueba = mp.id_mapa_prueba
+                 AND h.id_caso_prueba = cp.id_caso_prueba
+                 AND h.id_hallazgo = fh.id_hallazgo
+                 AND h.tipo_hallazgo = 4
+                 AND (h.fec_creacion >= COALESCE(:fechaFrom,h.fec_creacion) AND h.fec_creacion <= COALESCE(:fechaTo,h.fec_creacion))
+            GROUP BY idUsuario
+            ORDER BY idUsuario
+		]]>
+	</sql-query>
+	
+	<!-- Consulta Indicador Tiempos de Respuesta en Garantia -->
+	<sql-query name="consultarIndicadorTiemposRespuestaGarantia">
+		<return-scalar column="idHallazgo" type="java.lang.Integer"/>
+		<return-scalar column="clasificacion" type="java.lang.String"/>
+		<return-scalar column="idTipoSeveridad" type="java.lang.Integer"/>
+		<return-scalar column="prioridad" type="java.lang.String"/>
+		<return-scalar column="tiempoPrioridad" type="java.lang.Double"/>
+		<return-scalar column="fechaCreacion" type="java.util.Date"/>
+		<return-scalar column="fechaSolicitud" type="java.util.Date"/>
+		<return-scalar column="fechaRespuesta" type="java.util.Date"/>
+		
+		<![CDATA[
+		    SELECT
+	             h.id_hallazgo idHallazgo,
+	             severidad.nombre clasificacion,
+	             severidad.id_tipo_severidad idTipoSeveridad,
+	             prioridad.nombre prioridad,
+	             prioridad.puntaje tiempoPrioridad,
+	             h.fec_creacion fechaCreacion,
+	             h.fec_solicitud fechaSolicitud,
+                 (SELECT fh.fec_creacion
+                  FROM sgp_flujo_hallazgo fh
+                  WHERE fh.id_hallazgo = h.id_hallazgo
+                    -- sgp_parametro nombre = Cerrado
+                   AND fh.accion = 23) AS fechaRespuesta
+            FROM sgp_hallazgo h
+                  LEFT JOIN sgp_tipo_severidad severidad ON h.severidad = severidad.id_tipo_severidad
+                  LEFT JOIN sgp_tipo_prioridad prioridad ON h.prioridad = prioridad.id_tipo_prioridad,
+                 sgp_artefacto artefacto,
+                 sgp_proyecto p
+            WHERE p.id_proyecto = :idProyecto
+	         AND p.id_proyecto = artefacto.id_proyecto
+	         AND h.id_artefacto = artefacto.id_artefacto
+             AND h.tipo_hallazgo = 5
+             AND (h.fec_solicitud >= COALESCE(:fechaFrom,h.fec_solicitud) 
+             AND h.fec_solicitud <= COALESCE(:fechaTo,h.fec_solicitud))
+            ORDER BY idHallazgo
+		]]>
+	</sql-query>
+	
+<sql-query name="consultaHallazgosSeveridad">
+
+	<return-scalar column="severidad" type="java.lang.String"/>
+	<return-scalar column="color" type="java.lang.String"/>
+   	<![CDATA[
+
+
+   SELECT  distinct 
+
+         severidad.NOMBRE severidad
+        ,severidad.color color
+from 
+sgp_hallazgo hallazgo
+ LEFT JOIN SGP_Artefacto artefacto ON hallazgo.ID_ARtefacto = artefacto.ID_ARtefacto
+LEFT JOIN SGP_caso_prueba casoprueba ON hallazgo.ID_caso_prueba = casoprueba.ID_caso_prueba
+LEFT JOIN SGP_FLUJO_HALLAZGO flujoHallazgo ON hallazgo.ID_hallazgo = flujoHallazgo.ID_hallazgo
+LEFT JOIN sgp_tipo_hallazgo tipoHallazgo ON hallazgo.TIPO_HALLAZGO = tipoHallazgo.id_tipo_hallazgo
+LEFT JOIN sgp_tipo_prioridad prioridad ON hallazgo.PRIORIDAD = prioridad.id_tipo_prioridad
+LEFT JOIN sgp_tipo_severidad severidad ON hallazgo.SEVERIDAD = severidad.id_tipo_severidad
+LEFT JOIN sgp_causa_de_generacion causaGeneracion ON hallazgo.CAUSA_GENERACION = causaGeneracion.id_causa_de_generacion
+LEFT JOIN SGP_PARAMETRO causaAnulacion ON hallazgo.CAUSA_ANULACION = causaAnulacion.ID_PARAMETRO
+LEFT JOIN SGP_PROYECTO proyecto  ON artefacto.id_proyecto = proyecto.id_proyecto
+LEFT JOIN SGP_mapa_prueba mapaprueba  ON (casoprueba.id_mapa_prueba = mapaprueba.id_mapa_prueba)
+LEFT JOIN SGP_PROYECTO proyectos on proyectos.id_proyecto = mapaprueba.id_proyecto
+Left JOIN SGP_Artefacto artefactos on  casoprueba.id_artefacto=artefactos.id_artefacto
+LEFT JOIN SGP_USUARIO usuarioArtefacto ON artefacto.ID_USUARIO = usuarioArtefacto.ID_USUARIO
+LEFT JOIN SGP_PARAMETRO estado ON estado.ID_PARAMETRO = flujoHallazgo.accion
+LEFT JOIN SGP_USUARIO usuarioAsigna ON usuarioAsigna.login = hallazgo.usuario_crea
+LEFT JOIN SGP_USUARIO usuarioAsignado ON flujoHallazgo.ID_USUARIO_ASIGNADO = usuarioAsignado.ID_USUARIO
+LEFT JOIN SGP_PARAMETRO motivoReasigna ON hallazgo.MOTIVO_REASIGNACION = motivoReasigna.ID_PARAMETRO
+
+  WHERE 
+	flujoHallazgo.ID_FLUJO_HALLAZGO =
+	(SELECT flujo.ID_FLUJO_HALLAZGO
+	FROM 
+		SGP_FLUJO_HALLAZGO flujo
+ 	WHERE 
+ 		flujo.ID_HALLAZGO = hallazgo.ID_HALLAZGO 
+	ORDER BY flujo.FEC_CREACION DESC LIMIT 1) 
+ ]]>
+
+</sql-query>
+
+<sql-query name="hallazgoPorGarantia">
+<return-scalar column="hallazgosReportados" type="java.lang.Integer"/>
+<return-scalar column="hallazgosAnulados" type="java.lang.Integer"/>
+<return-scalar column="hallazgosInvalidados" type="java.lang.Integer"/>
+<return-scalar column="totalArtefacto" type="java.lang.Integer"/>
+
+  	<![CDATA[
+ select count(hallazgo.id_hallazgo) hallazgosReportados,
+
+(select count(hallazgo.id_hallazgo) hallazgoAnulado 
+from sgp_hallazgo hallazgo
+INNER JOIN SGP_flujo_hallazgo flujoHallazgo ON hallazgo.id_hallazgo = flujoHallazgo.id_hallazgo
+INNER JOIN SGP_parametro parametro ON parametro.id_parametro = flujoHallazgo.accion
+LEFT JOIN SGP_caso_prueba casoprueba ON hallazgo.ID_caso_prueba = casoprueba.ID_caso_prueba
+LEFT JOIN SGP_mapa_prueba mapaprueba  ON (casoprueba.id_mapa_prueba = mapaprueba.id_mapa_prueba)
+LEFT JOIN SGP_Artefacto artefacto ON hallazgo.ID_ARtefacto = artefacto.ID_ARtefacto
+LEFT JOIN SGP_PROYECTO proyecto  ON artefacto.id_proyecto = proyecto.id_proyecto
+LEFT JOIN SGP_PROYECTO proyectos on proyectos.id_proyecto = mapaprueba.id_proyecto
+left JOIN SGP_causa_de_generacion causaGeneracion ON causaGEneracion.id_causa_de_generacion = hallazgo.causa_generacion
+
+where (proyecto.id_proyecto=:proyecto or proyectos.id_proyecto=:proyecto) and causa_anulacion is not null
+and flujoHallazgo.accion=24
+AND hallazgo.FEC_CREACION  >= COALESCE(:fechaFrom,hallazgo.FEC_CREACION)
+AND hallazgo.FEC_CREACION  <= COALESCE(:fechaTo,hallazgo.FEC_CREACION)  
+and hallazgo.tipo_hallazgo IN(:codigoGarantia) and causaGeneracion.nombre Not IN (:estadosHallazgos)) hallazgosAnulados,
+
+(select count(hallazgo.id_hallazgo) hallazgoInvalido from sgp_hallazgo hallazgo
+INNER JOIN SGP_flujo_hallazgo flujoHallazgo ON hallazgo.id_hallazgo = flujoHallazgo.id_hallazgo
+INNER JOIN SGP_parametro parametro ON parametro.id_parametro = flujoHallazgo.accion
+LEFT JOIN SGP_caso_prueba casoprueba ON hallazgo.ID_caso_prueba = casoprueba.ID_caso_prueba
+LEFT JOIN SGP_mapa_prueba mapaprueba  ON (casoprueba.id_mapa_prueba = mapaprueba.id_mapa_prueba)
+LEFT JOIN SGP_Artefacto artefacto ON hallazgo.ID_ARtefacto = artefacto.ID_ARtefacto
+LEFT JOIN SGP_PROYECTO proyecto  ON artefacto.id_proyecto = proyecto.id_proyecto
+LEFT JOIN SGP_PROYECTO proyectos on proyectos.id_proyecto = mapaprueba.id_proyecto
+left JOIN SGP_causa_de_generacion causaGeneracion ON causaGEneracion.id_causa_de_generacion = hallazgo.causa_generacion
+where (proyecto.id_proyecto=:proyecto or proyectos.id_proyecto=:proyecto) and causa_anulacion is not null
+and parametro.valor='Invalidado' 
+AND hallazgo.FEC_CREACION  >= COALESCE(:fechaFrom,hallazgo.FEC_CREACION)
+AND hallazgo.FEC_CREACION  <= COALESCE(:fechaTo,hallazgo.FEC_CREACION)  
+and hallazgo.tipo_hallazgo IN(:codigoGarantia) and causaGeneracion.nombre Not IN (:estadosHallazgos)
+ ) hallazgosInvalidados,
+ 
+(select count(id_artefacto) from sgp_artefacto
+where id_proyecto=:proyecto 
+AND sgp_artefacto.FEC_CREACION  >= COALESCE(:fechaFrom,sgp_artefacto.FEC_CREACION)
+AND sgp_artefacto.FEC_CREACION  <= COALESCE(:fechaTo,sgp_artefacto.FEC_CREACION)  ) totalArtefacto
+
+from sgp_hallazgo hallazgo
+inner JOIN SGP_Artefacto artefacto ON hallazgo.ID_ARtefacto = artefacto.ID_ARtefacto
+left JOIN SGP_causa_de_generacion causaGeneracion ON causaGEneracion.id_causa_de_generacion = hallazgo.causa_generacion
+where artefacto.id_proyecto=:proyecto  
+AND hallazgo.FEC_CREACION  >= COALESCE(:fechaFrom,hallazgo.FEC_CREACION)
+AND hallazgo.FEC_CREACION  <= COALESCE(:fechaTo,hallazgo.FEC_CREACION) 
+and (causaGeneracion.nombre Not IN (:estadosHallazgos) or causaGeneracion.nombre is null)
+and hallazgo.tipo_hallazgo IN(:codigoGarantia)
+      ]]>
+</sql-query>
+<sql-query name="hallazgoPorGarantiaSinCausaGeneracion">
+<return-scalar column="hallazgosReportados" type="java.lang.Integer"/>
+<return-scalar column="hallazgosAnulados" type="java.lang.Integer"/>
+<return-scalar column="hallazgosInvalidados" type="java.lang.Integer"/>
+<return-scalar column="totalArtefacto" type="java.lang.Integer"/>
+
+  	<![CDATA[
+ select count(hallazgo.id_hallazgo) hallazgosReportados,
+
+(select count(hallazgo.id_hallazgo) hallazgoAnulado 
+from sgp_hallazgo hallazgo
+INNER JOIN SGP_flujo_hallazgo flujoHallazgo ON hallazgo.id_hallazgo = flujoHallazgo.id_hallazgo
+INNER JOIN SGP_parametro parametro ON parametro.id_parametro = flujoHallazgo.accion
+LEFT JOIN SGP_caso_prueba casoprueba ON hallazgo.ID_caso_prueba = casoprueba.ID_caso_prueba
+LEFT JOIN SGP_mapa_prueba mapaprueba  ON (casoprueba.id_mapa_prueba = mapaprueba.id_mapa_prueba)
+LEFT JOIN SGP_Artefacto artefacto ON hallazgo.ID_ARtefacto = artefacto.ID_ARtefacto
+LEFT JOIN SGP_PROYECTO proyecto  ON artefacto.id_proyecto = proyecto.id_proyecto
+LEFT JOIN SGP_PROYECTO proyectos on proyectos.id_proyecto = mapaprueba.id_proyecto
+
+
+where (proyecto.id_proyecto=:proyecto or proyectos.id_proyecto=:proyecto) 
+and flujoHallazgo.accion=24 and causa_anulacion is not null
+   AND hallazgo.FEC_CREACION  >= COALESCE(:fechaFrom,hallazgo.FEC_CREACION)
+AND hallazgo.FEC_CREACION  <= COALESCE(:fechaTo,hallazgo.FEC_CREACION)  
+and hallazgo.tipo_hallazgo IN(:codigoGarantia)) hallazgosAnulados,
+
+(select count(hallazgo.id_hallazgo) hallazgoInvalido from sgp_hallazgo hallazgo
+INNER JOIN SGP_flujo_hallazgo flujoHallazgo ON hallazgo.id_hallazgo = flujoHallazgo.id_hallazgo
+INNER JOIN SGP_parametro parametro ON parametro.id_parametro = flujoHallazgo.accion
+LEFT JOIN SGP_caso_prueba casoprueba ON hallazgo.ID_caso_prueba = casoprueba.ID_caso_prueba
+LEFT JOIN SGP_mapa_prueba mapaprueba  ON (casoprueba.id_mapa_prueba = mapaprueba.id_mapa_prueba)
+LEFT JOIN SGP_Artefacto artefacto ON hallazgo.ID_ARtefacto = artefacto.ID_ARtefacto
+LEFT JOIN SGP_PROYECTO proyecto  ON artefacto.id_proyecto = proyecto.id_proyecto
+LEFT JOIN SGP_PROYECTO proyectos on proyectos.id_proyecto = mapaprueba.id_proyecto
+left JOIN SGP_causa_de_generacion causaGeneracion ON causaGEneracion.id_causa_de_generacion = hallazgo.causa_generacion
+
+where (proyecto.id_proyecto=:proyecto or proyectos.id_proyecto=:proyecto) and causa_anulacion is not null
+and parametro.valor='Invalidado' AND hallazgo.FEC_CREACION  >= COALESCE(:fechaFrom,hallazgo.FEC_CREACION)
+     AND hallazgo.FEC_CREACION  <= COALESCE(:fechaTo,hallazgo.FEC_CREACION)  
+     and hallazgo.tipo_hallazgo IN(:codigoGarantia)
+ ) hallazgosInvalidados,
+ 
+(select count(id_artefacto) from sgp_artefacto
+where id_proyecto=:proyecto) totalArtefacto
+
+from sgp_hallazgo hallazgo
+inner JOIN SGP_Artefacto artefacto ON hallazgo.ID_ARtefacto = artefacto.ID_ARtefacto
+
+where artefacto.id_proyecto=:proyecto  
+
+AND hallazgo.FEC_CREACION  >= COALESCE(:fechaFrom,hallazgo.FEC_CREACION)
+AND hallazgo.FEC_CREACION  <= COALESCE(:fechaTo,hallazgo.FEC_CREACION) 
+ and hallazgo.tipo_hallazgo IN(:codigoGarantia)
+      ]]>
+</sql-query>
+<sql-query name="hallazgosPorArtefacto">
+<return-scalar column="nombreArtefacto" type="java.lang.String"/>
+<return-scalar column="cantidad" type="java.lang.Long"/>
+
+  	<![CDATA[
+select artefacto.nombre as nombreArtefacto, count(hallazgo) cantidad
+from sgp_hallazgo hallazgo 
+left join sgp_caso_prueba casoPrueba on casoPrueba.id_caso_prueba= hallazgo.id_caso_prueba  
+left join sgp_mapa_prueba mapaPrueba on  casoPrueba.id_mapa_prueba= mapaPrueba.id_mapa_prueba 
+left join sgp_artefacto artefacto on  artefacto.id_artefacto = hallazgo.id_artefacto
+left join sgp_tipo_hallazgo tipoHallazgo on hallazgo.tipo_hallazgo=tipoHallazgo.id_tipo_hallazgo 
+
+where (mapaPrueba.ID_PROYECTO = :proyecto or artefacto.id_proyecto = :proyecto) 
+and tipoHallazgo.nombre = :tipoHallazgo 
+and hallazgo.FEC_CREACION  >= COALESCE(:fechaFrom,hallazgo.FEC_CREACION)
+and hallazgo.FEC_CREACION  <= COALESCE(:fechaTo,hallazgo.FEC_CREACION)
+group by artefacto.nombre,artefacto.id_artefacto
+order by artefacto.id_artefacto ASC
+
+
+
+
+
+
+
+]]>
+</sql-query>
+
+<sql-query name="hallazgosPorSeveridad">
+<return-scalar column="nombreSeveridad" type="java.lang.String"/>
+<return-scalar column="cantidad" type="java.lang.Long"/>
+
+  	<![CDATA[
+select tipo_severidad.nombre as nombreSeveridad, count(hallazgo) cantidad
+from sgp_hallazgo hallazgo 
+left join sgp_caso_prueba casoPrueba on casoPrueba.id_caso_prueba= hallazgo.id_caso_prueba  
+left join sgp_mapa_prueba mapaPrueba on  casoPrueba.id_mapa_prueba= mapaPrueba.id_mapa_prueba 
+left join sgp_artefacto artefacto on artefacto.id_artefacto = hallazgo.id_artefacto
+left join sgp_tipo_severidad tipo_severidad on hallazgo.severidad =  tipo_severidad.id_tipo_severidad
+left join sgp_tipo_hallazgo tipoHallazgo on hallazgo.tipo_hallazgo=tipoHallazgo.id_tipo_hallazgo 
+
+where (mapaPrueba.ID_PROYECTO = :proyecto or artefacto.id_proyecto = :proyecto) 
+and tipoHallazgo.nombre = :tipoHallazgo 
+and hallazgo.FEC_CREACION  >= COALESCE(:fechaFrom, hallazgo.FEC_CREACION)
+and hallazgo.FEC_CREACION  <= COALESCE(:fechaTo, hallazgo.FEC_CREACION) 
+group by tipo_severidad.nombre
+order by tipo_severidad.nombre ASC
+]]>
+</sql-query>
+</hibernate-mapping>

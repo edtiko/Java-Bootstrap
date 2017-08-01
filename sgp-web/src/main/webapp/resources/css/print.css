@@ -1,0 +1,85 @@
+@page {
+	size: A4;
+	margin: 0;
+	height: auto;
+}
+
+.not-print{
+	display: none;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #FAFAFA;
+	font: 12pt "Tahoma";
+}
+
+* {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+@bottom{
+	
+}
+.page {
+	margin: 2%;
+	border: initial;
+	border-radius: initial;
+	width: initial;
+	height: initial;
+	min-height: initial;
+	box-shadow: initial;
+	background: initial;
+	text-align: justify;
+}
+.pie{
+	page-break-after: always;
+}
+.head, .pie {
+	display: block !important;
+}
+
+.pie{
+	border-bottom: 0px;
+}
+
+a,a:visited {
+	text-decoration: underline;
+}
+
+a[href]:after {
+	content: " (" attr(href) ")";
+}
+
+abbr[title]:after {
+	content: " (" attr(title) ")";
+}
+
+/*
+     * Don't show links for images, or javascript/internal links
+     */
+a[href^="javascript:"]:after,a[href^="#"]:after {
+	content: "";
+}
+
+pre,blockquote {
+	border: 1px solid #999;
+	page-break-inside: avoid;
+}
+
+thead {
+	display: table-header-group;
+}
+
+tr,img {
+	page-break-inside: avoid;
+}
+
+p,h2,h3 {
+	orphans: 3;
+	widows: 3;
+}
+h2,h3 {
+	page-break-after: avoid;
+}

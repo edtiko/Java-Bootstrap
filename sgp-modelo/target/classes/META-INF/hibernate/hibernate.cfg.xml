@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+                                         "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		
+		<mapping class="com.premize.sgp.modelo.entities.parametros.SgpTipoParametro" />
+		<mapping class="com.premize.sgp.modelo.entities.parametros.SgpParametro"/>
+		<mapping class="com.premize.sgp.modelo.entities.parametros.SgpUsuario"/>
+		<mapping class="com.premize.sgp.modelo.entities.anexo.SgpAnexoHallazgo"/>
+		<mapping class="com.premize.sgp.modelo.entities.parametros.SgpCiudad"/>
+		<mapping class="com.premize.sgp.modelo.entities.parametros.SgpDepartamento"/>
+		<mapping class="com.premize.sgp.modelo.entities.parametros.SgpEmpresa"/>
+		<mapping class="com.premize.sgp.modelo.entities.parametros.SgpPais"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpCasoPrueba"/>
+		<mapping class="com.premize.sgp.modelo.entities.parametros.SgpArtefacto"/>
+		<mapping class="com.premize.sgp.modelo.entities.parametros.SgpTipoArtefacto"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpEstadoFlujo"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpFlujoHallazgo"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpHallazgo"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpMapaPrueba"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpProyecto"/>
+		<mapping class="com.premize.sgp.modelo.entities.SgpSequence"/>
+		<mapping class="com.premize.sgp.modelo.entities.artefacto.SgpMapaArtefacto"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpUsuarioProyecto"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpTipoHallazgo"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpTipoPrioridad"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpTipoSeveridad"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpCausaGeneracion"/>
+		<mapping class="com.premize.sgp.modelo.entities.gestion.pruebas.SgpIndicadores"/>
+	</session-factory>
+</hibernate-configuration>

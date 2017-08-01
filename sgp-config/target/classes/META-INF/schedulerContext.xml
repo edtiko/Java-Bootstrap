@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<!-- Pruebas -->
+	<task:scheduler id="zipScheduler" pool-size="1" />
+
+	<task:scheduled-tasks scheduler="zipScheduler">
+	
+		<!-- Produccion: ejecuta cada 12 horas -->
+		<task:scheduled ref="reportesScheduler" method="deleteZipFiles"
+			cron="0 0 0/12 * * ?" />
+			
+		<!-- Pruebas y Desarrollo cada 5 minutos -->	
+		<!--<task:scheduled ref="reportesScheduler" method="deleteZipFiles"
+			cron="0 0/5 * * * ?" />-->
+
+	</task:scheduled-tasks>
+	
+	<bean id="reportesScheduler" class="com.premize.sgp.web.controller.ReportesScheduler" />
+
+</beans>

@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Notificacion Hallazgo Asignado</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+
+        <style>
+/*            table {
+                border-collapse: collapse;
+                width: 700px;
+                height: 20px;
+                font-weight: normal;
+                font-size: 9pt;
+                font-family: Arial,sans-serif;
+                margin: 0px;
+            }*/
+
+/*            th, td {
+                border: 1px solid #eaeaea;
+                text-align: left;
+                padding: 6px;
+                width: 110px;
+            }*/
+
+/*            th {
+                background-color:rgb(192,0,0);
+                color: #ffffff;
+            }*/
+        </style>
+    </head>
+    <body>
+        <div style="font-size: 9pt;font-family: Arial,sans-serif;font-weight: normal;">
+        <table style="border-collapse: collapse;width: 700px;height: 20px;margin: 0px;">
+            <tr>
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    T&#237;tulo
+                </th>
+                
+                <td style=" width: 540px;border: 1px solid #eaeaea;text-align: left;padding: 6px;">
+                    ${hallazgo.titulo}
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table style="border-collapse: collapse;height: 70px;width: 700px;margin: 0px;">
+            <tr>
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;width: 110px;
+                    background-color:rgb(192,0,0);color: #ffffff;">
+                    Id del Hallazgo
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${hallazgo.id}
+                </td>
+
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Proyecto
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${proyecto}
+                </td>
+            </tr>
+            <tr>
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Mapa de Pruebas
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${mapaPrueba}
+                </td>
+
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Artefacto
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${artefacto}
+                </td>
+            </tr>
+            <tr>
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Empresa
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${empresa}
+                </td>
+
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Tipo de Hallazgo
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${tipoHallazgo}
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table style="border-collapse: collapse;height: 70px;width: 700px;height: 20px;font-weight: normal;
+               font-size: 9pt;font-family: Arial,sans-serif;margin: 0px;">
+            <tr>
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Estado Actual
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${estadoActual}
+                </td>
+
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Usuario Actual
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${usuarioAsignado}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Severidad
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${severidad}
+                </td>
+
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Causa de Generaci&oacute;n
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${causaGeneracion}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Prioridad
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${prioridad}
+                </td>
+
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Causa de Anulaci&oacute;n
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 200px;text-align: left;padding: 6px;">
+                    ${causaAnulacion}
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table style="border-collapse: collapse;width: 700px;height: 20px;
+               font-weight: normal;font-size: 9pt;font-family: Arial,sans-serif;
+               margin: 0px;">
+            <tr style="background-color:rgb(192,0,0);color: #ffffff;">
+                <th style="width: 289px; text-align: center;border: 1px solid #eaeaea;">
+                    Descripci&oacute;n
+                </th>
+                <th style="text-align: center;padding: 6px;width: 110px;border: 1px solid #eaeaea;">
+                    Estado
+                </th>
+                <th style="text-align: center;padding: 6px;width: 110px;border: 1px solid #eaeaea;">
+                    Usuario
+                </th>
+                <th style="text-align: center;padding: 6px;width: 110px;border: 1px solid #eaeaea;">
+                    Fecha
+                </th>
+            </tr>
+            #foreach( $flujo in $flujos )
+            <tr>
+                <td style="white-space: pre-wrap;text-align: left !important;width: 289px;
+                    border: 1px solid #eaeaea;padding: 6px;">$flujo.observacion</td>
+                <td style="border: 1px solid #eaeaea;width: 110px;text-align: center;padding: 6px;">
+                    $flujo.estadoHallazgo.nombre
+                </td>
+                <td style="border: 1px solid #eaeaea;width: 110px;text-align: center;padding: 6px;">
+                    $flujo.usuarioCreacion
+                </td>
+                <td style="border: 1px solid #eaeaea;width: 110px;text-align: center;padding: 6px;">
+                    $flujo.fechaCreacionString
+                </td>
+            </tr>
+            #end
+        </table>
+        <br>
+        <table style="border-collapse: collapse;width: 700px;height: 20px;
+               font-weight: normal;font-size: 9pt;font-family: Arial,sans-serif;
+               margin: 0px;">
+            <tr>
+                <th style="border: 1px solid #eaeaea;text-align: left;padding: 6px;
+                    width: 110px;background-color:rgb(192,0,0);color: #ffffff;">
+                    Enlace Hallazgo
+                </th>
+                <td style="border: 1px solid #eaeaea;width: 500px;text-align: left;padding: 6px;">
+                    <a href="${enlaceHallazgo}" target="_blank">${hallazgo.titulo}</a>
+                </td>
+            </tr>
+        </table>
+        </div>
+    </body>
+</html>
+
